@@ -2,8 +2,12 @@ export default {
   testEnvironment: 'node',
   transform: {},
   testMatch: [
-    '**/__tests__/**/*.js',
-    '**/?(*.)+(spec|test).js'
+    '**/__tests__/**/*.test.js',
+    '**/__tests__/**/*.spec.js'
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/__tests__/config/'
   ],
   collectCoverageFrom: [
     'src/**/*.js',
