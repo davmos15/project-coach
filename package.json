@@ -1,0 +1,58 @@
+{
+  "name": "project-coach",
+  "version": "5.0.0",
+  "description": "AI productivity coach that integrates with Google Calendar to automate task scheduling and provide insights",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "deploy": "serverless deploy",
+    "deploy:prod": "serverless deploy --stage prod",
+    "deploy:dev": "serverless deploy --stage dev",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/ --ext .js",
+    "lint:fix": "eslint src/ --ext .js --fix",
+    "format": "prettier --write src/**/*.js",
+    "format:check": "prettier --check src/**/*.js",
+    "audit": "npm audit --audit-level moderate",
+    "clean": "rm -rf .serverless node_modules/.cache",
+    "prepare": "npm run lint && npm run test",
+    "precommit": "npm run lint && npm run format:check"
+  },
+  "dependencies": {
+    "googleapis": "^128.0.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "dotenv": "^16.3.1",
+    "yamljs": "^0.3.0",
+    "nodemailer": "^6.9.7",
+    "uuid": "^9.0.1",
+    "winston": "^3.10.0",
+    "node-cron": "^3.0.2"
+  },
+  "devDependencies": {
+    "serverless": "^3.35.2",
+    "serverless-offline": "^13.0.0",
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "ai",
+    "productivity",
+    "calendar",
+    "scheduling",
+    "google-calendar",
+    "serverless"
+  ],
+  "author": "Project Coach",
+  "license": "MIT"
+}
