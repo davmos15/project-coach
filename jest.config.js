@@ -1,14 +1,6 @@
 export default {
   testEnvironment: 'node',
-  extensionsToTreatAsEsm: ['.js'],
-  globals: {
-    'ts-jest': {
-      useESM: true
-    }
-  },
-  moduleNameMapping: {
-    '^(\\.{1,2}/.*)\\.js$': '$1'
-  },
+  transform: {},
   testMatch: [
     '**/__tests__/**/*.js',
     '**/?(*.)+(spec|test).js'
@@ -35,7 +27,8 @@ export default {
     }
   },
   setupFilesAfterEnv: [
-    '<rootDir>/src/__tests__/setup.js'
+    '<rootDir>/src/__tests__/config/setup.js'
   ],
-  testTimeout: 30000
+  testTimeout: 30000,
+  moduleFileExtensions: ['js', 'json', 'node']
 };
