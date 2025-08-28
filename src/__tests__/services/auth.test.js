@@ -1,4 +1,4 @@
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach } from '@jest/globals';
 import AuthService from '../../services/auth.js';
 
 describe('AuthService', () => {
@@ -11,7 +11,7 @@ describe('AuthService', () => {
   describe('generateAuthUrl', () => {
     it('should generate a valid auth URL', () => {
       const authUrl = authService.generateAuthUrl();
-      
+
       expect(authUrl).toBeDefined();
       expect(typeof authUrl).toBe('string');
     });
@@ -29,7 +29,7 @@ describe('AuthService', () => {
       });
 
       const result = await authService.exchangeCodeForTokens('test_code');
-      
+
       expect(result).toEqual(mockTokens);
       expect(authService.oauth2Client.getToken).toHaveBeenCalledWith('test_code');
     });
@@ -56,7 +56,7 @@ describe('AuthService', () => {
       });
 
       const result = await authService.refreshAccessToken('refresh_token');
-      
+
       expect(result).toEqual(mockCredentials);
     });
   });

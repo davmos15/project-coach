@@ -67,7 +67,7 @@ class GoogleDriveService {
       };
 
       const yamlContent = YAML.stringify(defaultConfig, 2);
-      
+
       const fileMetadata = {
         name: CONFIG_FILE.NAME,
         parents: ['root']
@@ -80,7 +80,7 @@ class GoogleDriveService {
 
       const response = await this.drive.files.create({
         requestBody: fileMetadata,
-        media: media,
+        media,
         fields: 'id'
       });
 
@@ -109,7 +109,7 @@ class GoogleDriveService {
   async getConfigFile() {
     try {
       let configFile = await this.findConfigFile();
-      
+
       if (!configFile) {
         logger.info('Config file not found, creating default');
         configFile = await this.createConfigFile();
@@ -122,7 +122,7 @@ class GoogleDriveService {
 
       const yamlContent = response.data;
       const config = YAML.parse(yamlContent);
-      
+
       logger.info('Successfully loaded config file');
       return config;
     } catch (error) {
@@ -139,7 +139,7 @@ class GoogleDriveService {
       }
 
       const yamlContent = YAML.stringify(config, 2);
-      
+
       const media = {
         mimeType: 'text/yaml',
         body: yamlContent
@@ -147,7 +147,7 @@ class GoogleDriveService {
 
       const response = await this.drive.files.update({
         fileId: configFile.id,
-        media: media
+        media
       });
 
       logger.info('Config file updated successfully');
@@ -160,7 +160,7 @@ class GoogleDriveService {
 
   parseProjectsFromConfig(config) {
     const projects = config.projects || [];
-    
+
     return projects.map(project => ({
       name: project.name,
       totalEstimatedHours: project.totalEstimatedHours || 1,
@@ -173,7 +173,7 @@ class GoogleDriveService {
 
   parseHabitsFromConfig(config) {
     const habits = config.habits || [];
-    
+
     return habits.map(habit => ({
       name: habit.name,
       type: habit.type || 'daily',
@@ -188,7 +188,7 @@ class GoogleDriveService {
   getSettingsFromConfig(config) {
     const settings = config.settings || {};
     const userPrefs = config.user_preferences || {};
-    
+
     return {
       defaultTaskBlockMinutes: settings.default_task_block_minutes || 45,
       maxTaskBlockMinutes: settings.max_task_block_minutes || 90,

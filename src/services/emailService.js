@@ -21,8 +21,8 @@ class EmailService {
       const mailOptions = {
         from: config.email.from,
         to: userEmail,
-        subject: subject,
-        html: html
+        subject,
+        html
       };
 
       const result = await this.transporter.sendMail(mailOptions);
@@ -43,8 +43,8 @@ class EmailService {
       const mailOptions = {
         from: config.email.from,
         to: userEmail,
-        subject: subject,
-        html: html
+        subject,
+        html
       };
 
       const result = await this.transporter.sendMail(mailOptions);
@@ -67,7 +67,7 @@ class EmailService {
       totalCompleted,
       completionRate,
       insights,
-      topCategories,
+      // topCategories,
       timeSpent
     } = data;
 

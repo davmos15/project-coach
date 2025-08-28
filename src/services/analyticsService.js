@@ -51,7 +51,7 @@ class AnalyticsService {
       if (!categoryData.bestTimeOfDay[timeOfDay]) {
         categoryData.bestTimeOfDay[timeOfDay] = { count: 0, totalEfficiency: 0 };
       }
-      
+
       const timeData = categoryData.bestTimeOfDay[timeOfDay];
       timeData.count += 1;
       timeData.totalEfficiency += (actualDuration / estimatedDuration);
@@ -67,7 +67,7 @@ class AnalyticsService {
       }
 
       await this.updateLearningConfig();
-      
+
       logger.info('Task completion tracked', {
         task: taskKey,
         category,
@@ -98,7 +98,7 @@ class AnalyticsService {
         };
       }
 
-      this.learningData.categoryPatterns[category].declines = 
+      this.learningData.categoryPatterns[category].declines =
         (this.learningData.categoryPatterns[category].declines || 0) + 1;
 
       if (!this.learningData.timePreferences[timeOfDay]) {
@@ -128,32 +128,32 @@ class AnalyticsService {
     try {
       const taskKey = this.generateTaskKey(task);
       const category = task.category || 'general';
-      
+
       const taskHistory = this.learningData.taskEstimates[taskKey];
       if (taskHistory && taskHistory.actuals.length > 0) {
         const recentActuals = taskHistory.actuals.slice(-3);
         const averageActual = recentActuals.reduce((sum, val) => sum + val, 0) / recentActuals.length;
-        
+
         logger.info('Using historical data for estimate', {
           task: taskKey,
           originalEstimate: task.estimatedMinutes,
           improvedEstimate: Math.round(averageActual)
         });
-        
+
         return Math.round(averageActual);
       }
 
       const categoryData = this.learningData.categoryPatterns[category];
       if (categoryData && categoryData.averageEfficiency > 0) {
         const adjustedEstimate = Math.round(task.estimatedMinutes * categoryData.averageEfficiency);
-        
+
         logger.info('Using category-based estimate', {
           category,
           originalEstimate: task.estimatedMinutes,
           efficiency: categoryData.averageEfficiency,
           improvedEstimate: adjustedEstimate
         });
-        
+
         return adjustedEstimate;
       }
 
@@ -238,8 +238,8 @@ class AnalyticsService {
   analyzeTimePreferences() {
     try {
       const timeData = {};
-      
-      for (const [category, data] of Object.entries(this.learningData.categoryPatterns)) {
+
+      for (const [, data] of Object.entries(this.learningData.categoryPatterns)) {
         for (const [timeOfDay, timeInfo] of Object.entries(data.bestTimeOfDay || {})) {
           if (!timeData[timeOfDay]) {
             timeData[timeOfDay] = { count: 0, totalEfficiency: 0 };
@@ -287,7 +287,7 @@ class AnalyticsService {
       if (taskCount === 0) return null;
 
       const accuracy = Math.min(totalEstimates / totalActuals, totalActuals / totalEstimates);
-      
+
       return {
         accuracy,
         averageEstimate: totalEstimates / taskCount,
@@ -304,11 +304,11 @@ class AnalyticsService {
   async updateLearningConfig() {
     try {
       const config = await this.driveService.getConfigFile();
-      
+
       if (!config.learning_data) {
         config.learning_data = {};
       }
-      
+
       config.learning_data = {
         ...config.learning_data,
         ...this.learningData,
@@ -325,7 +325,7 @@ class AnalyticsService {
   async loadLearningData() {
     try {
       const config = await this.driveService.getConfigFile();
-      
+
       if (config.learning_data) {
         this.learningData = {
           ...this.learningData,
@@ -347,7 +347,7 @@ class AnalyticsService {
 
   getTimeOfDay(date) {
     const hour = date.getHours();
-    
+
     if (hour >= 6 && hour < 12) {
       return 'morning';
     } else if (hour >= 12 && hour < 17) {

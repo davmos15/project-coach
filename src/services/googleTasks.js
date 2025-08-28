@@ -49,7 +49,7 @@ class GoogleTasksService {
     try {
       const defaultTaskList = await this.getDefaultTaskList();
       const tasks = await this.getTasks(defaultTaskList.id);
-      
+
       return tasks.filter(task => task.status !== 'completed');
     } catch (error) {
       logger.error('Error getting incomplete tasks:', error);
@@ -90,14 +90,14 @@ class GoogleTasksService {
   parseTaskForScheduling(task) {
     const title = task.title;
     const notes = task.notes || '';
-    
+
     let estimatedMinutes = 45;
-    
+
     const timeMatch = notes.match(/(\d+)\s*(min|minutes|hour|hours|h)/i);
     if (timeMatch) {
       const value = parseInt(timeMatch[1]);
       const unit = timeMatch[2].toLowerCase();
-      
+
       if (unit.includes('hour') || unit === 'h') {
         estimatedMinutes = value * 60;
       } else {
@@ -122,7 +122,7 @@ class GoogleTasksService {
 
   extractPriority(title, notes) {
     const text = `${title} ${notes}`.toLowerCase();
-    
+
     if (text.includes('urgent') || text.includes('asap') || text.includes('!!!')) {
       return 'high';
     }
@@ -132,13 +132,13 @@ class GoogleTasksService {
     if (text.includes('low priority') || text.includes('when time allows')) {
       return 'low';
     }
-    
+
     return 'medium';
   }
 
   extractCategory(title, notes) {
     const text = `${title} ${notes}`.toLowerCase();
-    
+
     const categories = {
       'meeting': ['meeting', 'call', 'standup', 'sync'],
       'coding': ['code', 'develop', 'implement', 'debug', 'fix', 'programming'],

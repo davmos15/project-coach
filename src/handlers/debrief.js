@@ -4,7 +4,7 @@ import GoogleDriveService from '../services/googleDrive.js';
 import EmailService from '../services/emailService.js';
 import logger from '../utils/logger.js';
 
-export const dailyHandler = async (event, context) => {
+export const dailyHandler = async (_event, _context) => {
   try {
     logger.info('Starting daily debrief process');
 
@@ -25,7 +25,7 @@ export const dailyHandler = async (event, context) => {
     }
 
     const debriefData = await generateDebriefData(calendarService, userConfig);
-    
+
     const userEmail = 'user@example.com';
     await emailService.sendDailyDebrief(userEmail, debriefData);
 
@@ -63,13 +63,13 @@ async function generateDebriefData(calendarService, userConfig) {
     const today = new Date();
     const startOfDay = new Date(today);
     startOfDay.setHours(0, 0, 0, 0);
-    
+
     const endOfDay = new Date(today);
     endOfDay.setHours(23, 59, 59, 999);
 
     const calendars = await calendarService.listCalendars();
     const suggestionCalendar = calendars.find(cal => cal.summary === 'AI Coach');
-    
+
     if (!suggestionCalendar) {
       throw new Error('AI Coach calendar not found');
     }
@@ -80,7 +80,7 @@ async function generateDebriefData(calendarService, userConfig) {
       endOfDay
     );
 
-    const aiScheduledEvents = events.filter(event => 
+    const aiScheduledEvents = events.filter(event =>
       event.extendedProperties?.private?.type === 'ai-scheduled-task'
     );
 
@@ -94,7 +94,7 @@ async function generateDebriefData(calendarService, userConfig) {
     for (const event of aiScheduledEvents) {
       const response = calendarService.parseAttendeeResponse(event, userEmail);
       const estimatedMinutes = parseInt(event.extendedProperties?.private?.estimatedMinutes || '45');
-      
+
       const taskData = {
         id: event.id,
         title: event.summary,
@@ -106,26 +106,26 @@ async function generateDebriefData(calendarService, userConfig) {
       };
 
       switch (response) {
-        case 'completed':
-          if (event.start && event.end) {
-            const actualDuration = Math.round(
-              (new Date(event.end.dateTime) - new Date(event.start.dateTime)) / (1000 * 60)
-            );
-            taskData.actualDuration = actualDuration;
-            totalTimeSpent += actualDuration;
-          } else {
-            totalTimeSpent += estimatedMinutes;
-          }
-          completedTasks.push(taskData);
-          break;
-        
-        case 'paused':
-          pausedTasks.push(taskData);
-          break;
-        
-        case 'declined':
-          declinedTasks.push(taskData);
-          break;
+      case 'completed':
+        if (event.start && event.end) {
+          const actualDuration = Math.round(
+            (new Date(event.end.dateTime) - new Date(event.start.dateTime)) / (1000 * 60)
+          );
+          taskData.actualDuration = actualDuration;
+          totalTimeSpent += actualDuration;
+        } else {
+          totalTimeSpent += estimatedMinutes;
+        }
+        completedTasks.push(taskData);
+        break;
+
+      case 'paused':
+        pausedTasks.push(taskData);
+        break;
+
+      case 'declined':
+        declinedTasks.push(taskData);
+        break;
       }
     }
 
@@ -179,7 +179,7 @@ function extractCategoryFromEvent(event) {
   return 'general';
 }
 
-function generateInsights(completedTasks, pausedTasks, declinedTasks, userConfig) {
+function generateInsights(completedTasks, pausedTasks, declinedTasks, _userConfig) {
   const insights = [];
 
   const totalTasks = completedTasks.length + pausedTasks.length + declinedTasks.length;
@@ -188,13 +188,13 @@ function generateInsights(completedTasks, pausedTasks, declinedTasks, userConfig
   const completionRate = (completedTasks.length / totalTasks) * 100;
 
   if (completionRate >= 80) {
-    insights.push("🎉 Excellent productivity today! You completed most of your scheduled tasks.");
+    insights.push('🎉 Excellent productivity today! You completed most of your scheduled tasks.');
   } else if (completionRate >= 60) {
-    insights.push("👍 Good progress today! You're on track with your goals.");
+    insights.push('👍 Good progress today! You\'re on track with your goals.');
   } else if (completionRate >= 40) {
-    insights.push("📈 Room for improvement. Consider adjusting your schedule or task estimates.");
+    insights.push('📈 Room for improvement. Consider adjusting your schedule or task estimates.');
   } else {
-    insights.push("🤔 Low completion rate today. Let's analyze what went wrong and adjust.");
+    insights.push('🤔 Low completion rate today. Let\'s analyze what went wrong and adjust.');
   }
 
   const avgEstimated = completedTasks.reduce((sum, task) => sum + task.estimatedDuration, 0) / completedTasks.length;
@@ -205,9 +205,9 @@ function generateInsights(completedTasks, pausedTasks, declinedTasks, userConfig
   if (avgActual && avgEstimated) {
     const efficiency = avgActual / avgEstimated;
     if (efficiency < 0.8) {
-      insights.push("⚡ You're working faster than expected! I'll adjust future estimates.");
+      insights.push('⚡ You\'re working faster than expected! I\'ll adjust future estimates.');
     } else if (efficiency > 1.2) {
-      insights.push("🐌 Tasks are taking longer than expected. I'll increase future estimates.");
+      insights.push('🐌 Tasks are taking longer than expected. I\'ll increase future estimates.');
     }
   }
 
@@ -217,11 +217,11 @@ function generateInsights(completedTasks, pausedTasks, declinedTasks, userConfig
   }
 
   if (declinedTasks.length > 2) {
-    insights.push("❌ Several tasks were declined. Consider reviewing your priorities or schedule.");
+    insights.push('❌ Several tasks were declined. Consider reviewing your priorities or schedule.');
   }
 
   if (pausedTasks.length > 1) {
-    insights.push("⏸️ Multiple tasks were paused. You might benefit from longer focused blocks.");
+    insights.push('⏸️ Multiple tasks were paused. You might benefit from longer focused blocks.');
   }
 
   return insights;
@@ -229,7 +229,7 @@ function generateInsights(completedTasks, pausedTasks, declinedTasks, userConfig
 
 function getTopCategories(tasks) {
   const categoryCounts = {};
-  
+
   tasks.forEach(task => {
     const category = task.category || 'general';
     categoryCounts[category] = (categoryCounts[category] || 0) + 1;

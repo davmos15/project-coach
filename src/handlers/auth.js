@@ -4,7 +4,7 @@ import GoogleDriveService from '../services/googleDrive.js';
 import logger from '../utils/logger.js';
 import { config } from '../config/environment.js';
 
-export const callbackHandler = async (event, context) => {
+export const callbackHandler = async (event, _context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -51,7 +51,7 @@ export const callbackHandler = async (event, context) => {
     }
 
     const userInfo = await authService.getUserInfo(tokens.access_token);
-    
+
     const primaryCalendar = await calendarService.getCalendarByName('primary');
     if (primaryCalendar) {
       const webhookUrl = `${config.app.baseUrl}/webhook/calendar`;

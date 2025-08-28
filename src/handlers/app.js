@@ -17,10 +17,10 @@ const app = express();
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"]
+      defaultSrc: ['\'self\''],
+      styleSrc: ['\'self\'', '\'unsafe-inline\''],
+      scriptSrc: ['\'self\'', '\'unsafe-inline\''],
+      imgSrc: ['\'self\'', 'data:', 'https:']
     }
   }
 }));
@@ -73,7 +73,7 @@ app.get('/auth/callback', async (req, res) => {
     }
 
     const userInfo = await authService.getUserInfo(tokens.access_token);
-    
+
     const groundTruthCalendar = await calendarService.getCalendarByName(userInfo.email);
     if (groundTruthCalendar) {
       const webhookUrl = `${config.app.baseUrl}/webhook/calendar`;
@@ -99,7 +99,7 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   logger.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });

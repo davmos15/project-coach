@@ -15,7 +15,7 @@ export const CONFIG_FILE = {
 
 export const TASK_STATES = {
   COMPLETED: 'completed',
-  PAUSED: 'paused', 
+  PAUSED: 'paused',
   DECLINED: 'declined',
   ABANDONED: 'abandoned'
 };

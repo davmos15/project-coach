@@ -8,7 +8,7 @@ const logger = winston.createLogger({
     winston.format.errors({ stack: true }),
     winston.format.json()
   ),
-  defaultMeta: { 
+  defaultMeta: {
     service: 'project-coach',
     stage: config.app.stage
   },

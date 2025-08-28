@@ -1,5 +1,5 @@
 import logger from '../utils/logger.js';
-import { DEFAULT_SETTINGS } from '../config/constants.js';
+// import { DEFAULT_SETTINGS } from '../config/constants.js';
 
 class SchedulingEngine {
   constructor(calendarService, tasksService, driveService, userConfig) {
@@ -43,21 +43,21 @@ class SchedulingEngine {
   prepareTasksForScheduling(tasks) {
     const projects = this.driveService.parseProjectsFromConfig(this.userConfig);
     const habits = this.driveService.parseHabitsFromConfig(this.userConfig);
-    
+
     const schedulableItems = [];
 
     tasks.forEach(task => {
       const parsedTask = this.tasksService.parseTaskForScheduling(task);
-      
-      const matchingProject = projects.find(p => 
+
+      const matchingProject = projects.find(p =>
         parsedTask.title.toLowerCase().includes(p.name.toLowerCase())
       );
-      
+
       if (matchingProject) {
         const sessionsNeeded = Math.ceil(
           matchingProject.totalEstimatedMinutes / matchingProject.sessionLength
         );
-        
+
         for (let i = 0; i < sessionsNeeded; i++) {
           schedulableItems.push({
             ...parsedTask,
@@ -90,12 +90,12 @@ class SchedulingEngine {
   calculateHabitSessions(habit) {
     const sessions = [];
     const now = new Date();
-    
+
     if (habit.type === 'daily') {
       for (let day = 0; day < 7; day++) {
         const targetDate = new Date(now);
         targetDate.setDate(targetDate.getDate() + day);
-        
+
         for (let session = 0; session < habit.count; session++) {
           sessions.push({
             id: `${habit.name}-${targetDate.toDateString()}-${session}`,
@@ -105,7 +105,7 @@ class SchedulingEngine {
             estimatedMinutes: habit.estimatedMinutes,
             priority: habit.priority,
             category: 'habit',
-            targetDate: targetDate,
+            targetDate,
             timePreference: habit.timePreference,
             description: habit.description
           });
@@ -135,7 +135,7 @@ class SchedulingEngine {
     try {
       const calendars = await this.calendarService.listCalendars();
       const primaryCalendar = calendars.find(cal => cal.primary) || calendars[0];
-      
+
       const busyTimes = await this.calendarService.getBusyTimes(
         [primaryCalendar.id],
         startTime,
@@ -155,8 +155,8 @@ class SchedulingEngine {
     const workEnd = this.settings.workingHoursEnd;
     const minimumSlotMinutes = 15;
 
-    let current = new Date(startTime);
-    
+    const current = new Date(startTime);
+
     while (current < endTime) {
       if (current.getDay() === 0 || current.getDay() === 6) {
         current.setDate(current.getDate() + 1);
@@ -166,7 +166,7 @@ class SchedulingEngine {
 
       const dayStart = new Date(current);
       dayStart.setHours(workStart, 0, 0, 0);
-      
+
       const dayEnd = new Date(current);
       dayEnd.setHours(workEnd, 0, 0, 0);
 
@@ -188,7 +188,7 @@ class SchedulingEngine {
             slots.push({
               start: new Date(slotStart),
               end: new Date(busyStart),
-              duration: duration
+              duration
             });
           }
         }
@@ -202,7 +202,7 @@ class SchedulingEngine {
           slots.push({
             start: new Date(slotStart),
             end: new Date(dayEnd),
-            duration: duration
+            duration
           });
         }
       }
@@ -223,21 +223,21 @@ class SchedulingEngine {
       const priorityWeight = { high: 3, medium: 2, low: 1 };
       const aPriority = priorityWeight[a.priority] || 2;
       const bPriority = priorityWeight[b.priority] || 2;
-      
+
       if (aPriority !== bPriority) return bPriority - aPriority;
-      
+
       if (a.due && b.due) {
         return new Date(a.due) - new Date(b.due);
       }
       if (a.due) return -1;
       if (b.due) return 1;
-      
+
       return 0;
     });
 
     for (const item of remainingItems) {
       const suitableSlots = this.findSuitableSlotsForItem(item, remainingSlots);
-      
+
       if (suitableSlots.length === 0) {
         logger.warn(`No suitable slot found for item: ${item.title}`);
         continue;
@@ -245,7 +245,7 @@ class SchedulingEngine {
 
       const bestSlot = this.selectBestSlot(item, suitableSlots);
       const scheduledItem = this.scheduleItemInSlot(item, bestSlot);
-      
+
       schedule.push(scheduledItem);
       this.updateRemainingSlots(remainingSlots, bestSlot, item.estimatedMinutes);
     }
@@ -266,15 +266,15 @@ class SchedulingEngine {
       if (item.timePreference) {
         const hour = slot.start.getHours();
         switch (item.timePreference) {
-          case 'morning':
-            if (hour < 9 || hour > 12) return false;
-            break;
-          case 'afternoon':
-            if (hour < 12 || hour > 17) return false;
-            break;
-          case 'evening':
-            if (hour < 17 || hour > 20) return false;
-            break;
+        case 'morning':
+          if (hour < 9 || hour > 12) return false;
+          break;
+        case 'afternoon':
+          if (hour < 12 || hour > 17) return false;
+          break;
+        case 'evening':
+          if (hour < 17 || hour > 20) return false;
+          break;
         }
       }
 
@@ -312,7 +312,7 @@ class SchedulingEngine {
       ...item,
       scheduledStart: startTime,
       scheduledEnd: endTime,
-      slot: slot
+      slot
     };
   }
 
@@ -322,11 +322,11 @@ class SchedulingEngine {
 
     const originalSlot = slots[slotIndex];
     const remainingDuration = originalSlot.duration - usedMinutes;
-    
+
     if (remainingDuration >= 15) {
       const newStart = new Date(originalSlot.start);
       newStart.setMinutes(newStart.getMinutes() + usedMinutes + this.settings.minimumBreakMinutes);
-      
+
       slots[slotIndex] = {
         start: newStart,
         end: new Date(originalSlot.end),
@@ -341,7 +341,7 @@ class SchedulingEngine {
     try {
       const calendars = await this.calendarService.listCalendars();
       const suggestionCalendar = calendars.find(cal => cal.summary === 'AI Coach');
-      
+
       if (!suggestionCalendar) {
         throw new Error('AI Coach calendar not found');
       }
@@ -370,7 +370,7 @@ class SchedulingEngine {
       const priorityWeight = { high: 3, medium: 2, low: 1 };
       const aPriority = priorityWeight[a.priority] || 2;
       const bPriority = priorityWeight[b.priority] || 2;
-      
+
       return bPriority - aPriority;
     });
   }

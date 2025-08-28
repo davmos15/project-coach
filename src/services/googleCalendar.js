@@ -156,18 +156,18 @@ class GoogleCalendarService {
 
   parseAttendeeResponse(event, userEmail) {
     const attendee = event.attendees?.find(a => a.email === userEmail);
-    
+
     if (!attendee) return null;
 
     switch (attendee.responseStatus) {
-      case INVITATION_RESPONSES.YES:
-        return 'completed';
-      case INVITATION_RESPONSES.MAYBE:
-        return 'paused';
-      case INVITATION_RESPONSES.NO:
-        return 'declined';
-      default:
-        return 'no_response';
+    case INVITATION_RESPONSES.YES:
+      return 'completed';
+    case INVITATION_RESPONSES.MAYBE:
+      return 'paused';
+    case INVITATION_RESPONSES.NO:
+      return 'declined';
+    default:
+      return 'no_response';
     }
   }
 

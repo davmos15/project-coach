@@ -21,10 +21,10 @@ const app = express();
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"]
+      defaultSrc: ['\'self\''],
+      styleSrc: ['\'self\'', '\'unsafe-inline\''],
+      scriptSrc: ['\'self\'', '\'unsafe-inline\''],
+      imgSrc: ['\'self\'', 'data:', 'https:']
     }
   }
 }));
@@ -71,7 +71,7 @@ app.get('/auth/callback', handleAsync(async (req, res) => {
   }
 
   const userInfo = await authService.getUserInfo(tokens.access_token);
-  
+
   const primaryCalendar = await calendarService.getCalendarByName('primary');
   if (primaryCalendar) {
     const webhookUrl = `${config.app.baseUrl}/webhook/calendar`;
@@ -85,8 +85,8 @@ app.get('/auth/callback', handleAsync(async (req, res) => {
 }));
 
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
     version: '5.0.0',
     environment: config.app.nodeEnv
@@ -97,13 +97,13 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   logger.error('Unhandled error:', err);
-  
+
   const statusCode = err.statusCode || 500;
   const message = err.isOperational ? err.message : 'Internal server error';
-  
-  res.status(statusCode).json({ 
+
+  res.status(statusCode).json({
     error: true,
     message,
     timestamp: new Date().toISOString()

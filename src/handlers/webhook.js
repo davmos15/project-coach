@@ -4,9 +4,9 @@ import GoogleTasksService from '../services/googleTasks.js';
 import GoogleDriveService from '../services/googleDrive.js';
 import { opportunityScheduler } from './scheduler.js';
 import logger from '../utils/logger.js';
-import { TASK_STATES } from '../config/constants.js';
+// import { TASK_STATES } from '../config/constants.js';
 
-export const calendarHandler = async (event, context) => {
+export const calendarHandler = async (event, _context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type,X-Goog-Channel-ID,X-Goog-Channel-Token,X-Goog-Resource-ID,X-Goog-Resource-URI,X-Goog-Channel-Expiration,X-Goog-Resource-State',
@@ -63,7 +63,7 @@ export const calendarHandler = async (event, context) => {
   }
 };
 
-async function handleCalendarEvent(channelId, calendarId, eventData) {
+async function handleCalendarEvent(channelId, calendarId, _eventData) {
   try {
     logger.info('Processing calendar event', { channelId, calendarId });
 
@@ -78,7 +78,7 @@ async function handleCalendarEvent(channelId, calendarId, eventData) {
       new Date(Date.now() + 24 * 60 * 60 * 1000)
     );
 
-    const aiScheduledEvents = events.filter(event => 
+    const aiScheduledEvents = events.filter(event =>
       event.extendedProperties?.private?.type === 'ai-scheduled-task'
     );
 
@@ -92,7 +92,7 @@ async function handleCalendarEvent(channelId, calendarId, eventData) {
   }
 }
 
-async function processTaskEvent(event, calendarService, tasksService, driveService) {
+async function processTaskEvent(event, calendarService, tasksService, _driveService) {
   try {
     if (!event.attendees || event.attendees.length === 0) {
       return;
@@ -110,17 +110,17 @@ async function processTaskEvent(event, calendarService, tasksService, driveServi
     logger.info(`Processing task response: ${response} for event: ${event.summary}`);
 
     switch (response) {
-      case 'completed':
-        await handleTaskCompleted(event, taskId, estimatedMinutes, calendarService, tasksService);
-        break;
-      
-      case 'paused':
-        await handleTaskPaused(event, taskId, calendarService);
-        break;
-      
-      case 'declined':
-        await handleTaskDeclined(event, taskId, calendarService);
-        break;
+    case 'completed':
+      await handleTaskCompleted(event, taskId, estimatedMinutes, calendarService, tasksService);
+      break;
+
+    case 'paused':
+      await handleTaskPaused(event, taskId, calendarService);
+      break;
+
+    case 'declined':
+      await handleTaskDeclined(event, taskId, calendarService);
+      break;
     }
 
   } catch (error) {
@@ -161,7 +161,7 @@ async function handleTaskCompleted(event, taskId, estimatedMinutes, calendarServ
   }
 }
 
-async function handleTaskPaused(event, taskId, calendarService) {
+async function handleTaskPaused(event, _taskId, _calendarService) {
   try {
     logger.info(`Task paused: ${event.summary}`);
 
@@ -171,10 +171,10 @@ async function handleTaskPaused(event, taskId, calendarService) {
   }
 }
 
-async function handleTaskDeclined(event, taskId, calendarService) {
+async function handleTaskDeclined(event, _taskId, calendarService) {
   try {
     logger.info(`Task declined: ${event.summary}`);
-    
+
     await calendarService.deleteEvent(event.organizer.email, event.id);
 
   } catch (error) {

@@ -6,7 +6,7 @@ export class AppError extends Error {
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     this.name = 'AppError';
-    
+
     Error.captureStackTrace(this, this.constructor);
   }
 }
@@ -80,34 +80,34 @@ export const handleLambdaError = (error) => {
 
 export const retryWithExponentialBackoff = async (fn, maxRetries = 3, baseDelay = 1000) => {
   let lastError;
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
-      
+
       if (attempt === maxRetries) {
         break;
       }
 
-      if (error.code === 'ENOTFOUND' || 
-          error.code === 'ECONNRESET' || 
+      if (error.code === 'ENOTFOUND' ||
+          error.code === 'ECONNRESET' ||
           error.code === 'ETIMEDOUT' ||
           (error.response && error.response.status >= 500)) {
-        
+
         const delay = baseDelay * Math.pow(2, attempt);
         logger.warn(`Retry attempt ${attempt + 1} after ${delay}ms`, {
           error: error.message
         });
-        
+
         await new Promise(resolve => setTimeout(resolve, delay));
       } else {
         throw error;
       }
     }
   }
-  
+
   throw lastError;
 };
 
@@ -115,22 +115,22 @@ export const handleGoogleAPIError = (error) => {
   if (error.response) {
     const status = error.response.status;
     const data = error.response.data;
-    
+
     switch (status) {
-      case 401:
-        throw new AuthenticationError('Google API authentication failed');
-      case 403:
-        throw new GoogleAPIError('Google API access forbidden - check permissions', 403);
-      case 404:
-        throw new GoogleAPIError('Google API resource not found', 404);
-      case 429:
-        throw new GoogleAPIError('Google API rate limit exceeded', 429);
-      case 500:
-      case 502:
-      case 503:
-        throw new GoogleAPIError('Google API server error', 502);
-      default:
-        throw new GoogleAPIError(`Unexpected Google API error: ${data?.error?.message || error.message}`, status);
+    case 401:
+      throw new AuthenticationError('Google API authentication failed');
+    case 403:
+      throw new GoogleAPIError('Google API access forbidden - check permissions', 403);
+    case 404:
+      throw new GoogleAPIError('Google API resource not found', 404);
+    case 429:
+      throw new GoogleAPIError('Google API rate limit exceeded', 429);
+    case 500:
+    case 502:
+    case 503:
+      throw new GoogleAPIError('Google API server error', 502);
+    default:
+      throw new GoogleAPIError(`Unexpected Google API error: ${data?.error?.message || error.message}`, status);
     }
   } else if (error.code === 'ENOTFOUND') {
     throw new GoogleAPIError('Network error - could not reach Google API', 503);
@@ -147,7 +147,7 @@ export const validateEnvironmentVariables = () => {
   ];
 
   const missing = required.filter(env => !process.env[env]);
-  
+
   if (missing.length > 0) {
     throw new AppError(
       `Missing required environment variables: ${missing.join(', ')}`,

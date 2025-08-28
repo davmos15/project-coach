@@ -5,7 +5,7 @@ import GoogleDriveService from '../services/googleDrive.js';
 import SchedulingEngine from '../services/schedulingEngine.js';
 import logger from '../utils/logger.js';
 
-export const nightlyHandler = async (event, context) => {
+export const nightlyHandler = async (_event, _context) => {
   try {
     logger.info('Starting nightly scheduling process');
 
@@ -15,7 +15,7 @@ export const nightlyHandler = async (event, context) => {
     const driveService = new GoogleDriveService(authService.getOAuth2Client());
 
     const userConfig = await driveService.getConfigFile();
-    
+
     const schedulingEngine = new SchedulingEngine(
       calendarService,
       tasksService,
@@ -51,10 +51,10 @@ export const nightlyHandler = async (event, context) => {
   }
 };
 
-export const opportunityHandler = async (event, context) => {
+export const opportunityHandler = async (event, _context) => {
   try {
     const { startTime, endTime } = JSON.parse(event.body || '{}');
-    
+
     if (!startTime || !endTime) {
       return {
         statusCode: 400,
@@ -94,10 +94,10 @@ export const opportunityHandler = async (event, context) => {
   }
 };
 
-export const opportunityScheduler = async (startTime, endTime, calendarService, tasksService, driveService) => {
+export const opportunityScheduler = async (startTime, endTime, calendarService, tasksService, _driveService) => {
   try {
     const availableMinutes = Math.round((endTime - startTime) / (1000 * 60));
-    
+
     if (availableMinutes < 15) {
       logger.info('Available time too short for opportunity scheduling');
       return { scheduled: false, reason: 'insufficient_time' };
@@ -117,11 +117,11 @@ export const opportunityScheduler = async (startTime, endTime, calendarService, 
     suitableTasks.sort((a, b) => {
       const aParsed = tasksService.parseTaskForScheduling(a);
       const bParsed = tasksService.parseTaskForScheduling(b);
-      
+
       const priorityWeight = { high: 3, medium: 2, low: 1 };
       const aPriority = priorityWeight[aParsed.priority] || 2;
       const bPriority = priorityWeight[bParsed.priority] || 2;
-      
+
       return bPriority - aPriority;
     });
 
@@ -130,7 +130,7 @@ export const opportunityScheduler = async (startTime, endTime, calendarService, 
 
     const calendars = await calendarService.listCalendars();
     const suggestionCalendar = calendars.find(cal => cal.summary === 'AI Coach');
-    
+
     if (!suggestionCalendar) {
       throw new Error('AI Coach calendar not found');
     }

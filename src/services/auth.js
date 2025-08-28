@@ -32,7 +32,7 @@ class AuthService {
     try {
       const { tokens } = await this.oauth2Client.getToken(code);
       this.oauth2Client.setCredentials(tokens);
-      
+
       logger.info('Successfully exchanged code for tokens');
       return tokens;
     } catch (error) {
@@ -69,7 +69,7 @@ class AuthService {
       this.oauth2Client.setCredentials({ access_token: accessToken });
       const oauth2 = google.oauth2({ version: 'v2', auth: this.oauth2Client });
       const { data } = await oauth2.userinfo.get();
-      
+
       logger.info(`Retrieved user info for: ${data.email}`);
       return data;
     } catch (error) {
