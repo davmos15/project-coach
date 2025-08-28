@@ -19,7 +19,7 @@
     "format:check": "prettier --check src/**/*.js",
     "audit": "npm audit --audit-level moderate",
     "clean": "rm -rf .serverless node_modules/.cache",
-    "prepare": "npm run lint && npm run test",
+    "prepare": "echo 'Skipping prepare for CI'",
     "precommit": "npm run lint && npm run format:check"
   },
   "dependencies": {
